@@ -82,6 +82,13 @@ class Language(str, Enum):
     """YAML language server (experimental).
     Must be explicitly specified as the main language, not auto-detected.
     """
+    STARLARK = "starlark"
+    """Starlark language server using starpls.
+    Used for Bazel and Buck2 build files (.bzl, BUCK, TARGETS).
+    Supports: document symbols, definition, references, hover, completion, diagnostics.
+    Not supported: rename, workspace symbols.
+    https://github.com/withered-magic/starpls
+    """
 
     @classmethod
     def iter_all(cls, include_experimental: bool = False) -> Iterable[Self]:
@@ -93,7 +100,14 @@ class Language(str, Enum):
         """
         Check if the language server is experimental or deprecated.
         """
-        return self in {self.TYPESCRIPT_VTS, self.PYTHON_JEDI, self.CSHARP_OMNISHARP, self.RUBY_SOLARGRAPH, self.MARKDOWN, self.YAML}
+        return self in {
+            self.TYPESCRIPT_VTS,
+            self.PYTHON_JEDI,
+            self.CSHARP_OMNISHARP,
+            self.RUBY_SOLARGRAPH,
+            self.MARKDOWN,
+            self.YAML,
+        }
 
     def __str__(self) -> str:
         return self.value
@@ -172,6 +186,8 @@ class Language(str, Enum):
                 )
             case self.HASKELL:
                 return FilenameMatcher("*.hs", "*.lhs")
+            case self.STARLARK:
+                return FilenameMatcher("*.bzl", "BUCK", "TARGETS", ".buckconfig")
             case _:
                 raise ValueError(f"Unhandled language: {self}")
 
@@ -317,6 +333,10 @@ class Language(str, Enum):
                 from solidlsp.language_servers.haskell_language_server import HaskellLanguageServer
 
                 return HaskellLanguageServer
+            case self.STARLARK:
+                from solidlsp.language_servers.starpls_server import StarplsServer
+
+                return StarplsServer
             case _:
                 raise ValueError(f"Unhandled language: {self}")
 

@@ -1,0 +1,44 @@
+load(":defs.bzl", "my_binary", "my_library", "create_test_target", "get_default_visibility")
+load("//lib:utils.bzl", "format_target_name")
+
+# Main application binary
+my_binary(
+    name = "main",
+    srcs = ["src/main.cpp"],
+    deps = [":core_lib"],
+)
+
+# Core library
+my_library(
+    name = "core_lib",
+    srcs = [
+        "src/core.cpp",
+    ],
+    hdrs = [
+        "include/core.h",
+    ],
+    deps = [":utils_lib"],
+)
+
+# Utilities library
+my_library(
+    name = "utils_lib",
+    srcs = [
+        "src/utils.cpp",
+    ],
+    hdrs = [
+        "include/utils.h",
+    ],
+)
+
+# Test targets
+create_test_target(
+    name = "main_test",
+    test_srcs = ["test/main_test.cpp"],
+)
+
+# Helper target using cross-file reference
+my_binary(
+    name = format_target_name("helper"),
+    srcs = ["src/helper.cpp"],
+)

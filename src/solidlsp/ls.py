@@ -876,7 +876,7 @@ class SolidLanguageServer(ABC):
             completions_list: list[ls_types.CompletionItem] = []
 
             for item in items:
-                assert "insertText" in item or "textEdit" in item
+                # LSP spec: label is required; insertText/textEdit are optional (label used as fallback)
                 assert "kind" in item
                 completion_item = {}
                 if "detail" in item:
